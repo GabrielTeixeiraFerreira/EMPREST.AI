@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>EMPREST.AI</title>
+    <meta
+      name="description"
+      content="Tela de login do sistema de empréstimo de equipamentos de TI."
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Raleway:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div class="login-shell">
+      <aside class="login-visual">
+        <div class="brand-row" aria-label="EMPREST.AI">
+          <span class="brand-mark" aria-hidden="true"></span>
+          <span class="brand-word">EMPREST<span class="brand-accent">.AI</span></span>
+        </div>
+
+        <h1>Controle cada item em movimento.</h1>
+
+        <p class="lead">
+          Acompanhe equipamentos, prazos e devoluções em um único fluxo simples,
+          com visibilidade para colaborador e operações.
+        </p>
+
+        <div class="stats" aria-label="Estatísticas do sistema">
+          <div class="stat-item">
+            <strong>3</strong>
+            <span>itens por pessoa</span>
+          </div>
+          <div class="stat-item">
+            <strong>14</strong>
+            <span>dias de prazo</span>
+          </div>
+          <div class="stat-item">
+            <strong>0</strong>
+            <span>linhas para preencher</span>
+          </div>
+        </div>
+
+        <footer>Operações · TI interno</footer>
+      </aside>
+
+      <main class="login-panel">
+        <div class="form-wrap">
+          <h2>Entrar</h2>
+          <p class="panel-text">Acesse seu painel e acompanhe seus empréstimos.</p>
+
+          <form id="loginForm" novalidate>
+            <label class="field">
+              <span>E-mail</span>
+              <input type="email" name="email" placeholder="nome@empresa.com" />
+            </label>
+
+            <label class="field">
+              <span>Senha</span>
+              <input type="password" name="password" placeholder="••••••••" />
+            </label>
+
+            <button type="submit" class="btn btn-primary btn-block">Entrar</button>
+            <button
+              type="button"
+              class="btn btn-secondary btn-block operations-access"
+              aria-label="Entrar como operações"
+            >
+              Entrar como Operações
+            </button>
+          </form>
+
+          <p class="helper">Cada pessoa vê apenas os próprios empréstimos.</p>
+        </div>
+      </main>
+    </div>
+
+    <script src="./script.js"></script>
+  </body>
+</html>
