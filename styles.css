@@ -348,6 +348,84 @@ h2 {
   text-align: center;
 }
 
+[hidden] {
+  display: none !important;
+}
+
+.catalog-shell {
+  width: min(1180px, calc(100% - 48px));
+  margin: 48px auto;
+}
+
+.catalog-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 24px;
+  margin-bottom: 32px;
+}
+
+.catalog-header h1 {
+  margin-bottom: 12px;
+  font-size: clamp(2.2rem, 5vw, 4rem);
+}
+
+.catalog-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 18px;
+}
+
+.equipment-card {
+  overflow: hidden;
+  border: 1px solid var(--divider);
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+}
+
+.equipment-image {
+  display: grid;
+  min-height: 120px;
+  place-items: center;
+  color: var(--accent-soft);
+  background: linear-gradient(135deg, var(--accent-deep), var(--surface-raised));
+  font-size: 13px;
+  text-transform: uppercase;
+}
+
+.equipment-card-body {
+  padding: 18px;
+}
+
+.equipment-card h2 {
+  margin: 6px 0 14px;
+  font-size: 17px;
+}
+
+.equipment-tag {
+  margin: 0;
+  color: var(--accent-soft);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+}
+
+.equipment-status {
+  display: inline-block;
+  padding: 5px 8px;
+  border-radius: var(--radius-sm);
+  color: var(--accent-soft);
+  background: rgba(47, 184, 172, 0.12);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.equipment-status.maintenance {
+  color: #f0b3a5;
+  background: rgba(210, 108, 91, 0.15);
+}
+
 @media (max-width: 900px) {
   .login-shell {
     grid-template-columns: 1fr;

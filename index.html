@@ -61,9 +61,9 @@
           </div>
 
           <form id="login-form" novalidate>
-            <label class="field" for="email">
-              <span>E-mail</span>
-              <input id="email" name="email" type="email" autocomplete="email" placeholder="nome@empresa.com" />
+            <label class="field" for="username">
+              <span>Usuário</span>
+              <input id="username" name="username" type="text" autocomplete="username" placeholder="userTeste" />
             </label>
 
             <label class="field" for="password">
@@ -82,6 +82,19 @@
           <p id="form-note" class="form-note">Cada pessoa vê apenas os próprios empréstimos.</p>
         </div>
       </section>
+    </main>
+
+    <main id="catalog-shell" class="catalog-shell" hidden>
+      <header class="catalog-header">
+        <div>
+          <p class="eyebrow">Catálogo inicial</p>
+          <h1>Equipamentos disponíveis</h1>
+          <p class="intro-copy">Consulte a situação atual dos equipamentos de TI.</p>
+        </div>
+        <button class="button button-secondary" id="logout-button" type="button">Sair</button>
+      </header>
+      <p id="catalog-message" class="form-message" role="status" aria-live="polite"></p>
+      <section id="catalog-grid" class="catalog-grid" aria-live="polite"></section>
     </main>
 
     <script src="./script.js"></script>
