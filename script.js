@@ -9,8 +9,12 @@ const formNote = document.querySelector('#form-note');
 const formMessage = document.querySelector('#form-message');
 const catalogMessage = document.querySelector('#catalog-message');
 const catalogGrid = document.querySelector('#catalog-grid');
+const catalogSearch = document.querySelector('#catalog-search');
+const catalogFilter = document.querySelector('#catalog-filter');
 const logoutButton = document.querySelector('#logout-button');
 const submitButton = loginForm.querySelector('button[type="submit"]');
+
+let catalogItems = [];
 
 const userContext = {
   title: 'Entrar',
@@ -33,17 +37,45 @@ const updateContext = (context) => {
 
 const statusLabel = (status) => status === 'available' ? 'Disponível' : 'Em manutenção';
 
-const renderCatalog = (equipment) => {
-  catalogGrid.innerHTML = equipment.map((item) => `
-    <article class="equipment-card">
-      <div class="equipment-image" aria-hidden="true">${item.category}</div>
-      <div class="equipment-card-body">
-        <p class="equipment-tag">${item.assetTag}</p>
-        <h2>${item.name}</h2>
-        <span class="equipment-status ${item.status}">${statusLabel(item.status)}</span>
-      </div>
-    </article>
-  `).join('');
+const escapeHtml = (value) => String(value)
+  .replaceAll('&', '&amp;')
+  .replaceAll('<', '&lt;')
+  .replaceAll('>', '&gt;')
+  .replaceAll('"', '&quot;')
+  .replaceAll("'", '&#039;');
+
+const filteredCatalog = () => {
+  const search = catalogSearch.value.trim().toLowerCase();
+  const status = catalogFilter.value;
+  return catalogItems.filter((item) => {
+    const matchesSearch = !search ||
+      `${item.assetTag} ${item.name}`.toLowerCase().includes(search);
+    return matchesSearch && (status === 'all' || item.status === status);
+  });
+};
+
+const renderCatalog = () => {
+  const equipment = filteredCatalog();
+  if (!equipment.length) {
+    catalogGrid.innerHTML = '<p class="catalog-empty">Nenhum equipamento encontrado.</p>';
+    return;
+  }
+
+  catalogGrid.innerHTML = equipment.map((item) => {
+    const image = item.imageUrl
+      ? `<img src="${escapeHtml(item.imageUrl)}" alt="" loading="lazy" />`
+      : `<span>${escapeHtml(item.category)}</span>`;
+    return `
+      <article class="equipment-card">
+        <div class="equipment-image">${image}</div>
+        <div class="equipment-card-body">
+          <p class="equipment-tag">${escapeHtml(item.assetTag)}</p>
+          <h2>${escapeHtml(item.name)}</h2>
+          <span class="equipment-status ${escapeHtml(item.status)}">${statusLabel(item.status)}</span>
+        </div>
+      </article>
+    `;
+  }).join('');
 };
 
 const showCatalog = async (accessToken) => {
@@ -54,10 +86,20 @@ const showCatalog = async (accessToken) => {
   if (!response.ok) {
     throw new Error('Não foi possível carregar o catálogo.');
   }
-  renderCatalog(await response.json());
+  catalogItems = await response.json();
+  renderCatalog();
   loginShell.hidden = true;
   catalogShell.hidden = false;
-  catalogMessage.textContent = '';
+  catalogMessage.textContent = `${catalogItems.length} equipamentos no catálogo.`;
+};
+
+const clearSession = () => {
+  sessionStorage.removeItem('emprestai_access_token');
+  catalogItems = [];
+  catalogShell.hidden = true;
+  loginShell.hidden = false;
+  loginForm.reset();
+  updateContext(userContext);
 };
 
 operationsButton.addEventListener('click', () => {
@@ -91,17 +133,20 @@ loginForm.addEventListener('submit', async (event) => {
     sessionStorage.setItem('emprestai_access_token', session.access_token);
     await showCatalog(session.access_token);
   } catch (error) {
-    formMessage.textContent = error.message;
+    formMessage.textContent = error instanceof Error
+      ? error.message
+      : 'Não foi possível concluir o login.';
   } finally {
     submitButton.disabled = false;
     submitButton.textContent = 'Entrar';
   }
 });
 
-logoutButton.addEventListener('click', () => {
-  sessionStorage.removeItem('emprestai_access_token');
-  catalogShell.hidden = true;
-  loginShell.hidden = false;
-  loginForm.reset();
-  updateContext(userContext);
-});
+catalogSearch.addEventListener('input', renderCatalog);
+catalogFilter.addEventListener('change', renderCatalog);
+logoutButton.addEventListener('click', clearSession);
+
+const savedToken = sessionStorage.getItem('emprestai_access_token');
+if (savedToken) {
+  showCatalog(savedToken).catch(() => clearSession());
+}
