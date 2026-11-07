@@ -103,12 +103,23 @@
           <select id="catalog-filter">
             <option value="all">Todas</option>
             <option value="available">Disponíveis</option>
+            <option value="loaned">Emprestados</option>
             <option value="maintenance">Em manutenção</option>
           </select>
         </label>
       </div>
       <p id="catalog-message" class="form-message" role="status" aria-live="polite"></p>
       <section id="catalog-grid" class="catalog-grid" aria-live="polite"></section>
+      <section class="loans-section" aria-labelledby="loans-title">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">Meu inventário</p>
+            <h2 id="loans-title">Empréstimos em aberto</h2>
+          </div>
+          <p id="loans-message" class="form-message" role="status" aria-live="polite"></p>
+        </div>
+        <div id="loans-list" class="loans-list" aria-live="polite"></div>
+      </section>
     </main>
 
     <script type="module" src="./script.js"></script>

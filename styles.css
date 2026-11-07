@@ -439,6 +439,17 @@ h2 {
   font-size: 17px;
 }
 
+.equipment-category {
+  margin: -7px 0 14px;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.loan-button {
+  width: 100%;
+  margin-top: 16px;
+}
+
 .equipment-tag {
   margin: 0;
   color: var(--accent-soft);
@@ -461,6 +472,61 @@ h2 {
 .equipment-status.maintenance {
   color: #f0b3a5;
   background: rgba(210, 108, 91, 0.15);
+}
+
+.equipment-status.loaned {
+  color: #e8c98b;
+  background: rgba(210, 164, 91, 0.15);
+}
+
+.loans-section {
+  margin-top: 56px;
+}
+
+.section-heading {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 20px;
+  margin-bottom: 18px;
+}
+
+.section-heading h2 {
+  margin-bottom: 0;
+}
+
+.loans-list {
+  display: grid;
+  gap: 10px;
+}
+
+.loan-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 18px;
+  border: 1px solid var(--divider);
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+}
+
+.loan-row h3 {
+  margin: 6px 0 0;
+  font-size: 16px;
+}
+
+.loan-due {
+  margin: 0;
+  color: var(--muted);
+  font-size: 13px;
+  text-align: right;
+}
+
+.loan-due strong {
+  display: block;
+  margin-top: 4px;
+  color: var(--accent-soft);
 }
 
 @media (max-width: 900px) {
@@ -507,6 +573,16 @@ h2 {
 
   .catalog-filter {
     width: auto;
+  }
+
+  .section-heading,
+  .loan-row {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .loan-due {
+    text-align: left;
   }
 
   h1 {

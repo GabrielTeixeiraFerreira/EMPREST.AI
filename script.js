@@ -15,10 +15,13 @@ const catalogMessage = document.querySelector('#catalog-message');
 const catalogGrid = document.querySelector('#catalog-grid');
 const catalogSearch = document.querySelector('#catalog-search');
 const catalogFilter = document.querySelector('#catalog-filter');
+const loansList = document.querySelector('#loans-list');
+const loansMessage = document.querySelector('#loans-message');
 const logoutButton = document.querySelector('#logout-button');
 const submitButton = loginForm.querySelector('button[type="submit"]');
 
 let catalogItems = [];
+let openLoans = [];
 
 const userContext = {
   title: 'Entrar',
@@ -39,7 +42,19 @@ const updateContext = (context) => {
   formMessage.textContent = '';
 };
 
-const statusLabel = (status) => status === 'available' ? 'Disponível' : 'Em manutenção';
+const statusLabel = (status) => ({
+  available: 'Disponível',
+  maintenance: 'Em manutenção',
+  loaned: 'Emprestado',
+}[status] || status);
+
+const categoryLabel = (category) => ({
+  notebook: 'Notebook',
+  monitor: 'Monitor',
+  cable: 'Cabo',
+  camera: 'Câmera',
+  accessory: 'Acessório',
+}[category] || category);
 
 const escapeHtml = (value) => String(value)
   .replaceAll('&', '&amp;')
@@ -58,6 +73,26 @@ const filteredCatalog = () => {
   });
 };
 
+const formatDate = (date) => new Intl.DateTimeFormat('pt-BR', {
+  dateStyle: 'medium',
+}).format(new Date(date));
+
+const renderLoans = () => {
+  if (!openLoans.length) {
+    loansList.innerHTML = '<p class="catalog-empty">Nenhum empréstimo em aberto.</p>';
+    return;
+  }
+  loansList.innerHTML = openLoans.map((loan) => `
+    <article class="loan-row">
+      <div>
+        <p class="equipment-tag">${escapeHtml(loan.equipment.assetTag)}</p>
+        <h3>${escapeHtml(loan.equipment.name)}</h3>
+      </div>
+      <p class="loan-due">Devolver até <strong>${formatDate(loan.dueAt)}</strong></p>
+    </article>
+  `).join('');
+};
+
 const renderCatalog = () => {
   const equipment = filteredCatalog();
   if (!equipment.length) {
@@ -68,38 +103,85 @@ const renderCatalog = () => {
   catalogGrid.innerHTML = equipment.map((item) => {
     const image = item.imageUrl
       ? `<img src="${escapeHtml(item.imageUrl)}" alt="" loading="lazy" />`
-      : `<span>${escapeHtml(item.category)}</span>`;
+      : `<span>${escapeHtml(categoryLabel(item.category))}</span>`;
     return `
       <article class="equipment-card">
         <div class="equipment-image">${image}</div>
         <div class="equipment-card-body">
           <p class="equipment-tag">${escapeHtml(item.assetTag)}</p>
           <h2>${escapeHtml(item.name)}</h2>
+          <p class="equipment-category">${escapeHtml(categoryLabel(item.category))}</p>
           <span class="equipment-status ${escapeHtml(item.status)}">${statusLabel(item.status)}</span>
+          ${item.status === 'available'
+            ? `<button class="button button-primary loan-button" data-equipment-id="${escapeHtml(item.id)}" type="button">Solicitar</button>`
+            : ''}
         </div>
       </article>
     `;
   }).join('');
+
+  catalogGrid.querySelectorAll('.loan-button').forEach((button) => {
+    button.addEventListener('click', () => requestLoan(button.dataset.equipmentId, button));
+  });
+};
+
+const apiRequest = async (path, accessToken, options = {}) => {
+  const response = await fetch(`${API_URL}${path}`, {
+    ...options,
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
+  });
+  if (!response.ok) {
+    const body = await response.json().catch(() => ({}));
+    throw new Error(body.message || 'Não foi possível concluir a operação.');
+  }
+  return response.json();
+};
+
+const loadLoans = async (accessToken) => {
+  openLoans = await apiRequest('/loans/me', accessToken);
+  renderLoans();
 };
 
 const showCatalog = async (accessToken) => {
   catalogMessage.textContent = 'Carregando catálogo...';
-  const response = await fetch(`${API_URL}/equipment`, {
-    headers: { Authorization: `Bearer ${accessToken}` },
-  });
-  if (!response.ok) {
-    throw new Error('Não foi possível carregar o catálogo.');
-  }
-  catalogItems = await response.json();
+  catalogItems = await apiRequest('/equipment', accessToken);
   renderCatalog();
+  await loadLoans(accessToken);
   loginShell.hidden = true;
   catalogShell.hidden = false;
   catalogMessage.textContent = `${catalogItems.length} equipamentos no catálogo.`;
 };
 
+const requestLoan = async (equipmentId, button) => {
+  const accessToken = sessionStorage.getItem('emprestai_access_token');
+  if (!accessToken) return;
+  button.disabled = true;
+  button.textContent = 'Solicitando...';
+  loansMessage.textContent = '';
+  try {
+    await apiRequest('/loans', accessToken, {
+      method: 'POST',
+      body: JSON.stringify({ equipmentId }),
+    });
+    await showCatalog(accessToken);
+    catalogMessage.textContent = 'Empréstimo criado com sucesso.';
+  } catch (error) {
+    loansMessage.textContent = error instanceof Error
+      ? error.message
+      : 'Não foi possível solicitar o equipamento.';
+    button.disabled = false;
+    button.textContent = 'Solicitar';
+  }
+};
+
 const clearSession = () => {
   sessionStorage.removeItem('emprestai_access_token');
   catalogItems = [];
+  openLoans = [];
   catalogShell.hidden = true;
   loginShell.hidden = false;
   loginForm.reset();
