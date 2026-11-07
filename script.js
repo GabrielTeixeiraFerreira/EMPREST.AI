@@ -1,4 +1,8 @@
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/v1';
+const configuredApiUrl = (import.meta.env.VITE_API_URL || 'http://localhost:3000')
+  .replace(/\/+$/, '');
+const API_URL = configuredApiUrl.endsWith('/v1')
+  ? configuredApiUrl
+  : `${configuredApiUrl}/v1`;
 const loginShell = document.querySelector('.login-shell');
 const catalogShell = document.querySelector('#catalog-shell');
 const loginForm = document.querySelector('#login-form');
