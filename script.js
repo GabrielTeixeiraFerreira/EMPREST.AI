@@ -1,4 +1,4 @@
-const API_URL = window.EMPRESAI_API_URL || 'http://localhost:3000/v1';
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/v1';
 const loginShell = document.querySelector('.login-shell');
 const catalogShell = document.querySelector('#catalog-shell');
 const loginForm = document.querySelector('#login-form');
